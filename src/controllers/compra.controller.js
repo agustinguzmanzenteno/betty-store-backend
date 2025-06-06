@@ -25,7 +25,6 @@ exports.crearDetalleCompra = (req, res) => {
   db.query(sqlInsert, [valores], (err, result) => {
     if (err) return res.status(500).send(err);
 
-    // Después de insertar, actualizar stock
     const actualizaciones = productos.map(prod => {
       return new Promise((resolve, reject) => {
         const sqlUpdate = `
@@ -40,7 +39,6 @@ exports.crearDetalleCompra = (req, res) => {
       });
     });
 
-    // Ejecutar todas las actualizaciones
     Promise.all(actualizaciones)
       .then(() => {
         res.status(201).json({ message: 'Detalle de compra registrado y stock actualizado correctamente', insertados: result.affectedRows });
@@ -102,7 +100,6 @@ exports.actualizarDetalleCompra = (req, res) => {
     db.query(sqlUpdate, [codDetCompra, nomDetCompra, cantDetCompra, precioDetCompra, fechaDetCompra, producto_id, id], (errUpdate) => {
       if (errUpdate) return res.status(500).send(errUpdate);
 
-      // Ajustar stock: restar anterior, sumar nuevo
       const sqlStock = `
         UPDATE producto 
         SET cantidadProd = cantidadProd - ? + ?
